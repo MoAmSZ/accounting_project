@@ -222,13 +222,26 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    Chart.defaults.font.family = 'Vazir';
+    Chart.defaults.font.family = 'Vazirmatn';
     Chart.defaults.font.size = 13;
     
     const chartColors = [
         '#4caf50', '#2196f3', '#ff9800', '#f44336', '#9c27b0',
         '#00bcd4', '#795548', '#607d8b', '#e91e63', '#673ab7'
     ];
+
+    // تابع تبدیل اعداد به فارسی
+    function formatNumber(num) {
+        const farsiDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        return num.toString().replace(/\d/g, x => farsiDigits[x]);
+    }
+
+    function formatCurrency(num) {
+        if (num === null || num === undefined) return '۰';
+        const parts = num.toString().split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "،");
+        return formatNumber(parts.join('.'));
+    }
     
     // نمودار روند درآمدها
     const trendCtx = document.getElementById('incomeTrendChart').getContext('2d');
@@ -276,7 +289,11 @@
                     padding: 12,
                     callbacks: {
                         label: function(context) {
-                            return context.label + ': ' + toFarsiNumber(context.raw.toLocaleString());
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            return label + formatCurrency(context.raw);
                         }
                     }
                 }
@@ -290,7 +307,7 @@
                     },
                     ticks: {
                         callback: function(value) {
-                            return toFarsiNumber(value.toLocaleString());
+                            return formatCurrency(value);
                         },
                         padding: 10
                     }
@@ -309,12 +326,15 @@
 
     // نمودار دایره‌ای درآمدها
     const pieCtx = document.getElementById('incomePieChart').getContext('2d');
+    const pieData = [{% for category in category_analysis %}{{ category.total }},{% endfor %}];
+    const pieLabels = [{% for category in category_analysis %}'{{ category.category__name }}',{% endfor %}];
+    
     new Chart(pieCtx, {
         type: 'doughnut',
         data: {
-            labels: [{% for category in category_analysis %}'{{ category.category__name }}',{% endfor %}],
+            labels: pieLabels,
             datasets: [{
-                data: [{% for category in category_analysis %}{{ category.total }},{% endfor %}],
+                data: pieData,
                 backgroundColor: chartColors,
                 borderWidth: 2,
                 borderColor: '#fff'
@@ -348,7 +368,11 @@
                     padding: 12,
                     callbacks: {
                         label: function(context) {
-                            return context.label + ': ' + toFarsiNumber(context.raw.toLocaleString());
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            return label + formatCurrency(context.raw);
                         }
                     }
                 }

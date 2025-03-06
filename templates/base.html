@@ -21,26 +21,34 @@
     
     <style>
         :root {
-            --primary-color: #6f42c1;
-            --primary-light: #8250df;
-            --primary-dark: #5a32a3;
-            --primary-subtle: #f3f0ff;
-            --success-subtle: #e8f5e9;
-            --danger-subtle: #ffebee;
-            --info-subtle: #e3f2fd;
+            --primary-color: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --primary-subtle: #e0e7ff;
+            --success-color: #10b981;
+            --success-light: #34d399;
+            --success-subtle: #d1fae5;
+            --danger-color: #ef4444;
+            --danger-light: #f87171;
+            --danger-subtle: #fee2e2;
+            --info-color: #3b82f6;
+            --info-light: #60a5fa;
+            --info-subtle: #dbeafe;
             --sidebar-width: 280px;
-            --card-border-radius: 15px;
+            --header-height: 60px;
+            --bottom-nav-height: 65px;
+            --card-border-radius: 16px;
             --transition-speed: 0.3s;
             --card-bg: #ffffff;
             --table-bg: #ffffff;
-            --hover-bg: #f8f9fa;
+            --hover-bg: #f8fafc;
         }
 
         [data-bs-theme="dark"] {
-            --primary-color: #a78bfa;
-            --primary-light: #c4b5fd;
-            --primary-dark: #8b5cf6;
-            --primary-subtle: #2e1065;
+            --primary-color: #818cf8;
+            --primary-light: #a5b4fc;
+            --primary-dark: #6366f1;
+            --primary-subtle: #1e1b4b;
             --bs-body-bg: #0f172a;
             --bs-body-color: #e2e8f0;
             --bs-border-color: #1e293b;
@@ -57,6 +65,8 @@
             background-color: var(--bs-body-bg);
             transition: all var(--transition-speed) ease;
             color: var(--bs-body-color);
+            min-height: 100vh;
+            padding-bottom: var(--bottom-nav-height);
         }
         
         /* سایدبار */
@@ -68,67 +78,214 @@
             bottom: 0;
             background-color: var(--card-bg);
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            z-index: 1000;
+            z-index: 1040;
             overflow-y: auto;
             transition: all var(--transition-speed) ease;
             padding: 1.5rem;
             border-left: 1px solid var(--bs-border-color);
+            transform: translateX(100%);
+        }
+        
+        .sidebar.show {
+            transform: translateX(0);
         }
         
         .sidebar .nav-link {
             color: var(--bs-body-color);
             padding: 0.8rem 1rem;
-            border-radius: 8px;
+            border-radius: 12px;
             transition: all 0.2s ease;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            opacity: 0.8;
         }
         
         .sidebar .nav-link:hover {
             background-color: var(--hover-bg);
             color: var(--primary-color);
+            opacity: 1;
+            transform: translateX(-5px);
         }
         
         .sidebar .nav-link.active {
             background-color: var(--primary-subtle);
             color: var(--primary-color);
             font-weight: 500;
+            opacity: 1;
         }
         
         .sidebar .nav-link i {
-            font-size: 1.1rem;
-            opacity: 0.8;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .nav-section {
+            color: var(--bs-body-color);
+            opacity: 0.6;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            padding: 0 1rem;
         }
         
         /* محتوای اصلی */
         .main-content {
-            margin-right: var(--sidebar-width);
             min-height: 100vh;
-            transition: margin var(--transition-speed) ease;
-            padding: 2rem;
+            transition: all var(--transition-speed) ease;
+            padding: calc(var(--header-height) + 1rem) 1rem var(--bottom-nav-height);
         }
         
-        /* استایل‌های عمومی */
-        .icon-circle {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            background-color: var(--bs-primary-subtle);
-            color: var(--bs-primary);
+        /* هدر موبایل */
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--card-bg);
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1030;
+            border-bottom: 1px solid var(--bs-border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .mobile-header .btn-menu {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: none;
+            background: var(--hover-bg);
+            color: var(--bs-body-color);
             font-size: 1.2rem;
+        }
+        
+        /* نوار پایین موبایل */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-height);
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0.5rem;
+            border-top: 1px solid var(--bs-border-color);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1030;
+        }
+        
+        .mobile-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--bs-body-color);
+            text-decoration: none;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            gap: 0.3rem;
+            border-radius: 12px;
+        }
+        
+        .mobile-nav-item.active {
+            color: var(--primary-color);
+            opacity: 1;
+            background-color: var(--primary-subtle);
+        }
+        
+        .mobile-nav-item i {
+            font-size: 1.4rem;
+        }
+        
+        /* کارت‌ها */
+        .card {
+            border: none;
+            border-radius: var(--card-border-radius);
+            background: var(--card-bg);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all var(--transition-speed) ease;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--bs-border-color);
+            padding: 1.25rem;
+        }
+        
+        .card-body {
+            padding: 1.25rem;
+        }
+        
+        .card-title {
+            color: var(--bs-body-color);
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .card-title i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+        
+        /* آیکون‌های دایره‌ای */
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
             transition: all 0.3s ease;
         }
         
-        .icon-circle:hover {
-            transform: scale(1.05);
+        .icon-circle.success {
+            background-color: var(--success-subtle);
+            color: var(--success-color);
         }
         
-        /* استایل‌های جدول */
+        .icon-circle.danger {
+            background-color: var(--danger-subtle);
+            color: var(--danger-color);
+        }
+        
+        .icon-circle.info {
+            background-color: var(--info-subtle);
+            color: var(--info-color);
+        }
+        
+        /* جداول */
         .table {
             margin: 0;
             --bs-table-bg: var(--table-bg);
@@ -139,8 +296,13 @@
             border-bottom-color: var(--bs-border-color);
         }
         
+        .table > tbody > tr {
+            transition: all 0.2s ease;
+        }
+        
         .table > tbody > tr:hover {
             background-color: var(--hover-bg);
+            transform: translateY(-2px);
         }
         
         .table th {
@@ -149,74 +311,55 @@
             white-space: nowrap;
         }
         
-        /* استایل‌های کارت */
-        .card {
-            border: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            border-radius: var(--card-border-radius);
-            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        /* نوار پیشرفت */
+        .progress {
+            height: 8px;
+            border-radius: 4px;
             overflow: hidden;
-            background-color: var(--card-bg);
+            background-color: var(--bs-border-color);
         }
         
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .card-header {
-            background-color: transparent;
-            border-bottom: 1px solid var(--bs-border-color);
-            padding: 1.25rem 1.5rem;
-        }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .card-title {
-            color: var(--bs-body-color);
-            font-weight: 600;
-            margin-bottom: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .card-title i {
-            color: var(--primary-color);
-            opacity: 0.9;
+        .progress-bar {
+            transition: width 0.5s ease;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
         }
         
         /* دکمه‌ها */
         .btn {
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            padding: 0.6rem 1.2rem;
             font-weight: 500;
             transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .btn:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+        }
+        
+        .btn i {
+            font-size: 1.1rem;
         }
         
         .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+            border: none;
         }
         
         .btn-primary:hover {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark);
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
         }
         
         /* فرم‌ها */
         .form-control, .form-select {
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
             border-color: var(--bs-border-color);
             background-color: var(--card-bg);
             color: var(--bs-body-color);
+            transition: all 0.2s ease;
         }
         
         .form-control:focus, .form-select:focus {
@@ -224,77 +367,12 @@
             box-shadow: 0 0 0 0.25rem var(--primary-subtle);
         }
         
-        /* موبایل */
-        @media (max-width: 991.98px) {
-            .sidebar {
-                transform: translateX(100%);
-            }
-            
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-right: 0;
-                padding: 1rem;
-                margin-bottom: 4.5rem;
-                padding-top: 4rem;
-            }
-            
-            .mobile-header {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                background: var(--card-bg);
-                padding: 0.75rem 1rem;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                z-index: 1030;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 1px solid var(--bs-border-color);
-            }
-            
-            .mobile-nav {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: var(--card-bg);
-                padding: 0.75rem;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-                z-index: 1030;
-                display: grid;
-                grid-template-columns: repeat(5, 1fr);
-                gap: 0.5rem;
-                border-top: 1px solid var(--bs-border-color);
-            }
-            
-            .mobile-nav-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                color: var(--bs-body-color);
-                text-decoration: none;
-                font-size: 0.75rem;
-                opacity: 0.7;
-                transition: all 0.3s ease;
-                padding: 0.25rem;
-            }
-            
-            .mobile-nav-item.active {
-                color: var(--primary-color);
-                opacity: 1;
-            }
-            
-            .mobile-nav-item i {
-                font-size: 1.25rem;
-                margin-bottom: 0.3rem;
-            }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
         }
         
-        /* اسکرول‌بار سفارشی */
+        /* اسکرول‌بار */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -323,239 +401,164 @@
             animation: fadeIn 0.3s ease forwards;
         }
         
-        /* پیام‌های سیستم */
-        .alert {
-            border: none;
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        /* دسکتاپ */
+        @media (min-width: 992px) {
+            body {
+                padding-bottom: 0;
+            }
+            
+            .sidebar {
+                transform: none;
+            }
+            
+            .main-content {
+                margin-right: var(--sidebar-width);
+                padding: 2rem;
+            }
+            
+            .mobile-header,
+            .mobile-nav {
+                display: none;
+            }
         }
         
-        .alert-success {
-            background-color: var(--success-subtle);
-            color: #2e7d32;
-        }
-        
-        .alert-danger {
-            background-color: var(--danger-subtle);
-            color: #d32f2f;
-        }
-        
-        .alert-info {
-            background-color: var(--info-subtle);
-            color: #0288d1;
-        }
-        
-        /* مودال‌ها */
-        .modal-content {
-            border: none;
-            border-radius: var(--card-border-radius);
-            background-color: var(--card-bg);
-        }
-        
-        .modal-header {
-            border-bottom-color: var(--bs-border-color);
-            padding: 1.25rem 1.5rem;
-        }
-        
-        .modal-footer {
-            border-top-color: var(--bs-border-color);
-            padding: 1.25rem 1.5rem;
-        }
-        
-        /* نمودارها */
-        canvas {
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        canvas:hover {
-            transform: scale(1.01);
-        }
-        
-        /* جداول */
-        .table-hover tbody tr {
-            transition: all 0.2s ease;
-        }
-        
-        .table-hover tbody tr:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        
-        /* نوار پیشرفت */
-        .progress {
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            background-color: var(--bs-border-color);
-        }
-        
-        .progress-bar {
-            transition: width 0.5s ease;
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
-        }
-        
-        /* فیلدهای فرم */
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--bs-body-color);
-        }
-        
-        .form-control::placeholder {
-            color: var(--bs-gray-500);
-            opacity: 0.7;
-        }
-        
-        /* دکمه‌های گروهی */
-        .btn-group {
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .btn-group .btn {
-            border: 1px solid var(--bs-border-color);
-            background-color: var(--card-bg);
-            color: var(--bs-body-color);
-            padding: 0.5rem 1rem;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-group .btn:hover {
-            background-color: var(--hover-bg);
-            transform: translateY(-1px);
-        }
-        
-        .btn-group .btn.active {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            color: #fff;
-        }
-        
-        /* آیکون‌ها */
-        .icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background-color: var(--hover-bg);
-            color: var(--primary-color);
-            transition: all 0.2s ease;
-        }
-        
-        .icon:hover {
-            transform: scale(1.1);
-            background-color: var(--primary-subtle);
-        }
-        
-        /* بج‌ها */
-        .badge {
-            padding: 0.35em 0.65em;
-            font-size: 0.75em;
-            font-weight: 500;
-            border-radius: 6px;
-        }
-        
-        .badge-success {
-            background-color: var(--success-subtle);
-            color: #2e7d32;
-        }
-        
-        .badge-danger {
-            background-color: var(--danger-subtle);
-            color: #d32f2f;
-        }
-        
-        .badge-info {
-            background-color: var(--info-subtle);
-            color: #0288d1;
+        /* موبایل */
+        @media (max-width: 991.98px) {
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .table-responsive {
+                margin: 0 -1rem;
+                padding: 0 1rem;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+            }
+            
+            .mobile-nav-item span {
+                font-size: 0.7rem;
+            }
         }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 sidebar">
-                <div class="text-center mb-4">
-                    <h4 class="text-white mb-0">
-                        <i class="fas fa-wallet me-2"></i>
-                        حسابداری شخصی
-                    </h4>
-                </div>
-                <!-- دکمه تغییر تم -->
-                <div class="text-center mb-3">
-                    <button class="btn btn-light btn-sm" id="theme-toggle">
-                        <i class="fas fa-moon"></i>
-                        <span class="theme-text">حالت تاریک</span>
-                    </button>
-                </div>
-                <nav class="nav flex-column">
-                    <a href="{% url 'core:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                        <i class="fas fa-home"></i>
-                        داشبورد
-                    </a>
-                    
-                    <div class="nav-section">مدیریت مالی</div>
-                    <a href="{% url 'core:account_list' %}" class="nav-link {% if 'account' in request.resolver_match.url_name %}active{% endif %}">
-                        <i class="fas fa-university"></i>
-                        حساب‌های بانکی
-                    </a>
-                    <a href="{% url 'core:transaction_list' %}" class="nav-link {% if 'transaction' in request.resolver_match.url_name %}active{% endif %}">
-                        <i class="fas fa-exchange-alt"></i>
-                        تراکنش‌ها
-                    </a>
-                    <a href="{% url 'core:category_list' %}" class="nav-link {% if 'category' in request.resolver_match.url_name %}active{% endif %}">
-                        <i class="fas fa-tags"></i>
-                        دسته‌بندی‌ها
-                    </a>
-                    
-                    <div class="nav-section">برنامه‌ریزی</div>
-                    <a href="{% url 'core:saving_goal_list' %}" class="nav-link {% if 'saving_goal' in request.resolver_match.url_name %}active{% endif %}">
-                        <i class="fas fa-piggy-bank"></i>
-                        اهداف پس‌انداز
-                    </a>
-
-                    <div class="nav-section">گزارش‌ها و تحلیل‌ها</div>
-                    <a href="{% url 'reports:financial_report' %}" class="nav-link {% if 'financial_report' in request.resolver_match.url_name %}active{% endif %}">
-                        <i class="fas fa-chart-line"></i>
-                        گزارش مالی
-                    </a>
-                    <a href="{% url 'reports:expense_analysis' %}" class="nav-link {% if 'expense_analysis' in request.resolver_match.url_name %}active{% endif %}">
-                        <i class="fas fa-chart-pie"></i>
-                        تحلیل هزینه‌ها
-                    </a>
-                    <a href="{% url 'reports:income_analysis' %}" class="nav-link {% if 'income_analysis' in request.resolver_match.url_name %}active{% endif %}">
-                        <i class="fas fa-chart-bar"></i>
-                        تحلیل درآمدها
-                    </a>
-                </nav>
-            </div>
-            
-            <!-- Main Content -->
-            <div class="col-md-10 main-content">
-                {% if messages %}
-                <div class="messages mb-4">
-                    {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                
-                {% block content %}{% endblock %}
-            </div>
+    <!-- سایدبار -->
+    <div class="sidebar">
+        <div class="text-center mb-4">
+            <h4 class="mb-0">
+                <i class="fas fa-wallet me-2"></i>
+                حسابداری شخصی
+            </h4>
         </div>
+        
+        <!-- دکمه تغییر تم -->
+        <div class="text-center mb-3">
+            <button class="btn btn-light btn-sm" id="theme-toggle">
+                <i class="fas fa-moon"></i>
+                <span class="theme-text">حالت تاریک</span>
+            </button>
+        </div>
+        
+        <nav class="nav flex-column">
+            <a href="{% url 'core:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                داشبورد
+            </a>
+            
+            <div class="nav-section">مدیریت مالی</div>
+            <a href="{% url 'core:account_list' %}" class="nav-link {% if 'account' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-university"></i>
+                حساب‌های بانکی
+            </a>
+            <a href="{% url 'core:transaction_list' %}" class="nav-link {% if 'transaction' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-exchange-alt"></i>
+                تراکنش‌ها
+            </a>
+            <a href="{% url 'core:category_list' %}" class="nav-link {% if 'category' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-tags"></i>
+                دسته‌بندی‌ها
+            </a>
+            
+            <div class="nav-section">برنامه‌ریزی</div>
+            <a href="{% url 'core:saving_goal_list' %}" class="nav-link {% if 'saving_goal' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-piggy-bank"></i>
+                اهداف پس‌انداز
+            </a>
+
+            <div class="nav-section">گزارش‌ها و تحلیل‌ها</div>
+            <a href="{% url 'reports:financial_report' %}" class="nav-link {% if 'financial_report' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-chart-line"></i>
+                گزارش مالی
+            </a>
+            <a href="{% url 'reports:expense_analysis' %}" class="nav-link {% if 'expense_analysis' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i>
+                تحلیل هزینه‌ها
+            </a>
+            <a href="{% url 'reports:income_analysis' %}" class="nav-link {% if 'income_analysis' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i>
+                تحلیل درآمدها
+            </a>
+        </nav>
     </div>
-    
+
+    <!-- هدر موبایل -->
+    <div class="mobile-header">
+        <button class="btn-menu" id="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h4>
+            <i class="fas fa-wallet"></i>
+            حسابداری شخصی
+        </h4>
+        <button class="btn-menu" id="theme-toggle-mobile">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <!-- محتوای اصلی -->
+    <div class="main-content">
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- نوار پایین موبایل -->
+    <div class="mobile-nav">
+        <a href="{% url 'core:dashboard' %}" class="mobile-nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>داشبورد</span>
+        </a>
+        <a href="{% url 'core:transaction_list' %}" class="mobile-nav-item {% if 'transaction' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-exchange-alt"></i>
+            <span>تراکنش‌ها</span>
+        </a>
+        <a href="{% url 'core:account_list' %}" class="mobile-nav-item {% if 'account' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-university"></i>
+            <span>حساب‌ها</span>
+        </a>
+        <a href="{% url 'reports:financial_report' %}" class="mobile-nav-item {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-chart-line"></i>
+            <span>گزارش‌ها</span>
+        </a>
+        <a href="{% url 'core:category_list' %}" class="mobile-nav-item {% if 'category' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-tags"></i>
+            <span>دسته‌ها</span>
+        </a>
+    </div>
+
     <!-- مودال تایید حذف -->
     <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -564,7 +567,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center py-4">
-                    <div class="icon-circle mx-auto mb-4" style="width: 60px; height: 60px; background-color: #ffebee; color: #d32f2f;">
+                    <div class="icon-circle danger mx-auto mb-4" style="width: 64px; height: 64px;">
                         <i class="fas fa-exclamation-triangle fa-2x"></i>
                     </div>
                     <h5 class="mb-3">آیا از حذف این مورد اطمینان دارید؟</h5>
@@ -572,11 +575,11 @@
                 </div>
                 <div class="modal-footer border-0 pt-0 justify-content-center gap-2">
                     <a href="#" class="btn btn-danger px-4" id="confirmDeleteBtn">
-                        <i class="fas fa-trash me-1"></i>
+                        <i class="fas fa-trash"></i>
                         حذف
                     </a>
                     <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i>
+                        <i class="fas fa-times"></i>
                         انصراف
                     </button>
                 </div>
@@ -584,228 +587,89 @@
         </div>
     </div>
 
-    <!-- حذف منوی همبرگری و بروزرسانی نوار پایین -->
-    <div class="d-md-none">
-        <!-- نوار بالا -->
-        <div class="mobile-header">
-            <h4>
-                <i class="fas fa-wallet"></i>
-                حسابداری شخصی
-            </h4>
-            <button class="btn btn-light btn-sm" id="theme-toggle-mobile">
-                <i class="fas fa-moon"></i>
-                <span class="theme-text">حالت تاریک</span>
-            </button>
-        </div>
-
-        <!-- نوار پایین -->
-        <div class="mobile-nav">
-            <a href="{% url 'core:dashboard' %}" class="mobile-nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                <i class="fas fa-home"></i>
-                <span>داشبورد</span>
-            </a>
-            <a href="{% url 'core:account_list' %}" class="mobile-nav-item {% if 'account' in request.resolver_match.url_name %}active{% endif %}">
-                <i class="fas fa-university"></i>
-                <span>حساب‌ها</span>
-            </a>
-            <a href="{% url 'core:transaction_list' %}" class="mobile-nav-item {% if 'transaction' in request.resolver_match.url_name %}active{% endif %}">
-                <i class="fas fa-exchange-alt"></i>
-                <span>تراکنش‌ها</span>
-            </a>
-            <a href="{% url 'reports:financial_report' %}" class="mobile-nav-item {% if 'financial_report' in request.resolver_match.url_name %}active{% endif %}">
-                <i class="fas fa-chart-line"></i>
-                <span>گزارش‌ها</span>
-            </a>
-            <a href="{% url 'core:saving_goal_list' %}" class="mobile-nav-item {% if 'saving_goal' in request.resolver_match.url_name %}active{% endif %}">
-                <i class="fas fa-piggy-bank"></i>
-                <span>اهداف</span>
-            </a>
-        </div>
-    </div>
-
     <!-- جاوااسکریپت -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Custom Scripts -->
     <script>
-        // تبدیل اعداد انگلیسی به فارسی
+        // تابع‌های تبدیل اعداد و تاریخ
         function toFarsiNumber(n) {
-            if (n === null || n === undefined || n === '') return '';
+            if (n === null || n === undefined) return '';
             const farsiDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
             return n.toString().replace(/\d/g, x => farsiDigits[x]);
         }
 
-        // تبدیل مبالغ به فرمت فارسی
         function formatMoney(amount) {
-            if (!amount) return '';
-            // حذف همه کاراکترها به جز اعداد
-            amount = amount.toString().replace(/[^\d]/g, '');
-            if (!amount) return '';
-            // تبدیل به عدد و فرمت‌بندی با جداکننده هزارگان
-            return toFarsiNumber(Number(amount).toLocaleString());
+            if (!amount) return '۰';
+            const parts = amount.toString().split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "،");
+            return toFarsiNumber(parts.join('.'));
         }
 
-        // نام ماه‌های شمسی
-        const jalaliMonths = [
-            'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
-            'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
-        ];
-
-        // نام روزهای هفته
-        const weekDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
-
-        // تبدیل تاریخ میلادی به شمسی
-        function toJalaliDate(date) {
-            try {
-                // حذف بخش timezone از تاریخ
-                date = date.split('T')[0];
-                
-                // تجزیه تاریخ به اجزای سال، ماه و روز
-                const [year, month, day] = date.split('-').map(Number);
-                
-                // اطمینان از معتبر بودن اجزای تاریخ
-                if (!year || !month || !day) {
-                    throw new Error('تاریخ نامعتبر است');
-                }
-                
-                // ایجاد شیء تاریخ
-                const dateObj = new Date(year, month - 1, day);
-                
-                // آرایه نام روزهای هفته به فارسی
-                const weekDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
-                
-                // تبدیل تاریخ میلادی به شمسی
-                const date = new Intl.DateTimeFormat('fa-IR').format(dateObj);
-                
-                // دریافت نام روز هفته
-                const weekDay = weekDays[dateObj.getDay()];
-                
-                // ترکیب نام روز و تاریخ
-                return weekDay + '، ' + date;
-            } catch (error) {
-                console.error('خطا در تبدیل تاریخ:', error);
-                return date;
-            }
-        }
-
-        // تبدیل ساعت به فرمت فارسی
-        function toFarsiTime(date) {
-            try {
-                if (!date) return '';
-                const d = new Date(date);
-                if (isNaN(d.getTime())) return '';
-                const hours = d.getHours().toString().padStart(2, '0');
-                const minutes = d.getMinutes().toString().padStart(2, '0');
-                return toFarsiNumber(`${hours}:${minutes}`);
-            } catch (e) {
-                console.error('Error converting time:', e);
-                return '';
-            }
-        }
-
-        // محاسبه زمان نسبی
-        function getRelativeTime(date) {
-            try {
-                if (!date) return '';
-                const now = new Date();
-                const d = new Date(date);
-                if (isNaN(d.getTime())) return '';
-                
-                const diff = Math.floor((now - d) / 1000); // تفاوت به ثانیه
-
-                if (diff < 60) return 'چند لحظه پیش';
-                if (diff < 3600) return toFarsiNumber(Math.floor(diff / 60)) + ' دقیقه پیش';
-                if (diff < 86400) return toFarsiNumber(Math.floor(diff / 3600)) + ' ساعت پیش';
-                if (diff < 604800) return toFarsiNumber(Math.floor(diff / 86400)) + ' روز پیش';
-                
-                return toJalaliDate(date);
-            } catch (e) {
-                console.error('Error calculating relative time:', e);
-                return date;
-            }
-        }
-
-        // تبدیل همه تاریخ‌ها و اعداد در صفحه
         function convertAllDatesAndNumbers() {
-            // تبدیل تاریخ‌ها
-            document.querySelectorAll('.date-format').forEach(el => {
-                const date = el.getAttribute('data-date');
-                if (date) {
-                    const jalaliDate = toJalaliDate(date);
-                    el.textContent = jalaliDate;
-                    el.setAttribute('title', getRelativeTime(date));
+            // تبدیل اعداد به فارسی
+            document.querySelectorAll('.number-format').forEach(function(el) {
+                const originalNumber = el.textContent.trim().replace(/[,٬]/g, '');
+                if (!isNaN(originalNumber)) {
+                    el.textContent = formatMoney(originalNumber);
                 }
             });
 
-            // تبدیل تاریخ و ساعت‌ها
-            document.querySelectorAll('.datetime-format').forEach(el => {
-                const date = el.getAttribute('data-date');
-                if (date) {
-                    const jalaliDate = toJalaliDate(date);
-                    const time = toFarsiTime(date);
-                    el.textContent = `${jalaliDate} ساعت ${time}`;
-                    el.setAttribute('title', getRelativeTime(date));
+            document.querySelectorAll('.money-format').forEach(function(el) {
+                const originalNumber = el.textContent.trim().replace(/[,٬]/g, '');
+                if (!isNaN(originalNumber)) {
+                    el.textContent = formatMoney(originalNumber);
                 }
             });
 
-            // تبدیل اعداد
-            document.querySelectorAll('.number-format, .money-format').forEach(el => {
-                if (!el.textContent || el.textContent.trim() === '') return;
-                
-                const originalText = el.textContent.trim();
-                let amount = originalText.replace(/[^\d]/g, '');
-                if (amount) {
-                    el.textContent = toFarsiNumber(Number(amount).toLocaleString());
-                }
-                if (el.classList.contains('money-format')) {
-                    const originalText = el.textContent.trim();
-                    let amount = originalText.replace(/[^\d]/g, '');
-                    if (amount) {
-                        el.textContent = toFarsiNumber(Number(amount).toLocaleString());
+            // تبدیل اعداد در نمودارها
+            if (typeof Chart !== 'undefined') {
+                Chart.defaults.plugins.tooltip.callbacks.label = function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                        label += ': ';
                     }
-                } else {
-                    const number = el.textContent.trim();
-                    if (number) {
-                        el.textContent = toFarsiNumber(number);
-                    }
-                }
-            });
+                    label += formatMoney(context.parsed);
+                    return label;
+                };
+
+                Chart.defaults.scales.category.ticks.callback = function(value) {
+                    return toFarsiNumber(value);
+                };
+
+                Chart.defaults.scales.linear.ticks.callback = function(value) {
+                    return formatMoney(value);
+                };
+            }
         }
 
-        // اجرای تابع تبدیل در هنگام بارگذاری صفحه
-        document.addEventListener('DOMContentLoaded', convertAllDatesAndNumbers);
-
-        // اجرای تابع تبدیل هنگام تغییر محتوای صفحه
-        const observer = new MutationObserver(convertAllDatesAndNumbers);
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        // تابع تایید حذف
-        function confirmDelete(event, url) {
-            event.preventDefault();
-            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-            const confirmBtn = document.getElementById('confirmDeleteBtn');
-            confirmBtn.href = url;
-            modal.show();
-        }
-
-        // فعال کردن تولتیپ‌ها
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
+        // اجرای تابع تبدیل بعد از لود صفحه
+        document.addEventListener('DOMContentLoaded', function() {
+            convertAllDatesAndNumbers();
         });
-    </script>
-    
-    <!-- Theme Toggle Script -->
-    <script>
+
+        // نمایش/مخفی کردن سایدبار در موبایل
+        document.getElementById('sidebar-toggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+
+        // بستن سایدبار با کلیک خارج از آن
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            
+            if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        // تغییر تم
         document.addEventListener('DOMContentLoaded', function() {
             const themeToggle = document.getElementById('theme-toggle');
             const themeToggleMobile = document.getElementById('theme-toggle-mobile');
             const themeIcon = themeToggle.querySelector('i');
             const themeText = themeToggle.querySelector('.theme-text');
             const mobileThemeIcon = themeToggleMobile.querySelector('i');
-            const mobileThemeText = themeToggleMobile.querySelector('.theme-text');
             
-            // بررسی تم ذخیره شده
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-bs-theme', savedTheme);
             updateThemeButton(savedTheme === 'dark');
@@ -826,7 +690,6 @@
                 themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
                 themeText.textContent = isDark ? 'حالت روشن' : 'حالت تاریک';
                 mobileThemeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-                mobileThemeText.textContent = isDark ? 'حالت روشن' : 'حالت تاریک';
             }
         });
     </script>
