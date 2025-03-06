@@ -1,12 +1,12 @@
 const CACHE_NAME = 'accounting-app-v1';
-const STATIC_CACHE = 'static-v1';
-const DYNAMIC_CACHE = 'dynamic-v1';
+const STATIC_CACHE = 'static-v2';
+const DYNAMIC_CACHE = 'dynamic-v2';
 
 const STATIC_ASSETS = [
     '/',
-    'manifest.json',
-    'icons/icon-192x192.png',
-    'icons/icon-512x512.png',
+    '/static/manifest.json',
+    '/static/icons/icon-192x192.png',
+    '/static/icons/icon-512x512.png',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
     'https://cdn.jsdelivr.net/npm/persian.js@0.4.0/persian.min.js',
