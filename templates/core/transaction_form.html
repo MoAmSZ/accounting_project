@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}ویرایش تراکنش{% else %}تراکنش جدید{% endif %} - حسابداری شخصی{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- هدر صفحه -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <div class="icon-circle me-3">
+                <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus{% endif %} fa-lg"></i>
+            </div>
+            <div>
+                <h3 class="mb-1">{% if form.instance.pk %}ویرایش تراکنش{% else %}تراکنش جدید{% endif %}</h3>
+                <p class="text-muted mb-0">{% if form.instance.pk %}ویرایش اطلاعات تراکنش موجود{% else %}ثبت تراکنش جدید در سیستم{% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- فرم -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form method="post" class="row g-3">
+                        {% csrf_token %}
+
+                        <!-- نوع تراکنش -->
+                        <div class="col-12">
+                            <label class="form-label">نوع تراکنش</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="type" id="type_income" value="income" {% if form.type.value == 'income' %}checked{% endif %}>
+                                <label class="btn btn-outline-success" for="type_income">
+                                    <i class="fas fa-arrow-down me-1"></i>
+                                    درآمد
+                                </label>
+
+                                <input type="radio" class="btn-check" name="type" id="type_expense" value="expense" {% if form.type.value == 'expense' %}checked{% endif %}>
+                                <label class="btn btn-outline-danger" for="type_expense">
+                                    <i class="fas fa-arrow-up me-1"></i>
+                                    هزینه
+                                </label>
+
+                                <input type="radio" class="btn-check" name="type" id="type_transfer" value="transfer" {% if form.type.value == 'transfer' %}checked{% endif %}>
+                                <label class="btn btn-outline-info" for="type_transfer">
+                                    <i class="fas fa-exchange-alt me-1"></i>
+                                    انتقال
+                                </label>
+                            </div>
+                            {% if form.type.errors %}
+                            <div class="invalid-feedback d-block">{{ form.type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- تاریخ -->
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.date.id_for_label }}">تاریخ</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                {{ form.date }}
+                            </div>
+                            {% if form.date.errors %}
+                            <div class="invalid-feedback d-block">{{ form.date.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- مبلغ -->
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.amount.id_for_label }}">مبلغ (تومان)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-money-bill"></i></span>
+                                {{ form.amount }}
+                            </div>
+                            {% if form.amount.errors %}
+                            <div class="invalid-feedback d-block">{{ form.amount.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- حساب -->
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.account.id_for_label }}">حساب</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-wallet"></i></span>
+                                {{ form.account }}
+                            </div>
+                            {% if form.account.errors %}
+                            <div class="invalid-feedback d-block">{{ form.account.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- حساب مقصد (برای انتقال) -->
+                        <div class="col-md-6 transfer-only" style="display: none;">
+                            <label class="form-label" for="{{ form.related_account.id_for_label }}">حساب مقصد</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-wallet"></i></span>
+                                {{ form.related_account }}
+                            </div>
+                            {% if form.related_account.errors %}
+                            <div class="invalid-feedback d-block">{{ form.related_account.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- دسته‌بندی -->
+                        <div class="col-md-6 category-only">
+                            <label class="form-label" for="{{ form.category.id_for_label }}">دسته‌بندی</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tags"></i></span>
+                                {{ form.category }}
+                            </div>
+                            {% if form.category.errors %}
+                            <div class="invalid-feedback d-block">{{ form.category.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- توضیحات -->
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.description.id_for_label }}">توضیحات</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-comment"></i></span>
+                                {{ form.description }}
+                            </div>
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- دکمه‌ها -->
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                ذخیره
+                            </button>
+                            <a href="{% url 'core:transaction_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                انصراف
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeInputs = document.querySelectorAll('input[name="type"]');
+    const transferFields = document.querySelector('.transfer-only');
+    const categoryFields = document.querySelector('.category-only');
+    const categorySelect = document.getElementById('{{ form.category.id_for_label }}');
+    
+    // دریافت همه دسته‌بندی‌ها با AJAX
+    async function fetchCategories(transactionType) {
+        try {
+            const response = await fetch(`/api/categories/?type=${transactionType}`);
+            if (!response.ok) throw new Error('خطا در دریافت دسته‌بندی‌ها');
+            const categories = await response.json();
+            
+            // پاک کردن گزینه‌های فعلی
+            categorySelect.innerHTML = '';
+            
+            // اضافه کردن گزینه خالی
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.text = '---------';
+            categorySelect.add(emptyOption);
+            
+            // اضافه کردن دسته‌بندی‌ها
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.text = category.name;
+                categorySelect.add(option);
+            });
+        } catch (error) {
+            console.error('خطا در دریافت دسته‌بندی‌ها:', error);
+        }
+    }
+
+    function updateFields() {
+        const selectedType = document.querySelector('input[name="type"]:checked').value;
+        if (selectedType === 'transfer') {
+            transferFields.style.display = 'block';
+            categoryFields.style.display = 'none';
+            categorySelect.value = '';  // پاک کردن مقدار انتخاب شده
+        } else {
+            transferFields.style.display = 'none';
+            categoryFields.style.display = 'block';
+            fetchCategories(selectedType);  // دریافت دسته‌بندی‌های مرتبط
+        }
+    }
+
+    typeInputs.forEach(input => {
+        input.addEventListener('change', updateFields);
+    });
+
+    // اجرای اولیه برای تنظیم وضعیت فیلدها
+    updateFields();
+});
+</script>
+{% endblock %}
+
+{% endblock %} 

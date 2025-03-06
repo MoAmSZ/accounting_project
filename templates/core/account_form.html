@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}ویرایش حساب{% else %}حساب جدید{% endif %} - حسابداری شخصی{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- هدر صفحه -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <div class="icon-circle me-3">
+                <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus{% endif %} fa-lg"></i>
+            </div>
+            <div>
+                <h3 class="mb-1">{% if form.instance.pk %}ویرایش حساب{% else %}حساب جدید{% endif %}</h3>
+                <p class="text-muted mb-0">{% if form.instance.pk %}ویرایش اطلاعات حساب موجود{% else %}افزودن حساب جدید به سیستم{% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- فرم -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form method="post" class="row g-3">
+                        {% csrf_token %}
+
+                        <!-- نوع حساب -->
+                        <div class="col-12">
+                            <label class="form-label">نوع حساب</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="account_type" id="type_cash" value="cash" {% if form.account_type.value == 'cash' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary" for="type_cash">
+                                    <i class="fas fa-wallet me-1"></i>
+                                    نقدی
+                                </label>
+
+                                <input type="radio" class="btn-check" name="account_type" id="type_bank" value="bank" {% if form.account_type.value == 'bank' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary" for="type_bank">
+                                    <i class="fas fa-university me-1"></i>
+                                    حساب بانکی
+                                </label>
+
+                                <input type="radio" class="btn-check" name="account_type" id="type_card" value="card" {% if form.account_type.value == 'card' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary" for="type_card">
+                                    <i class="fas fa-credit-card me-1"></i>
+                                    کارت بانکی
+                                </label>
+
+                                <input type="radio" class="btn-check" name="account_type" id="type_digital" value="digital" {% if form.account_type.value == 'digital' %}checked{% endif %}>
+                                <label class="btn btn-outline-primary" for="type_digital">
+                                    <i class="fas fa-mobile-alt me-1"></i>
+                                    کیف پول دیجیتال
+                                </label>
+                            </div>
+                            {% if form.account_type.errors %}
+                            <div class="invalid-feedback d-block">{{ form.account_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- نام حساب -->
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.name.id_for_label }}">نام حساب</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-signature"></i></span>
+                                {{ form.name }}
+                            </div>
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- موجودی اولیه -->
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.initial_balance.id_for_label }}">موجودی اولیه (تومان)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-money-bill"></i></span>
+                                {{ form.initial_balance }}
+                            </div>
+                            {% if form.initial_balance.errors %}
+                            <div class="invalid-feedback d-block">{{ form.initial_balance.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- نام بانک -->
+                        <div class="col-md-6 bank-only" style="display: none;">
+                            <label class="form-label" for="{{ form.bank_name.id_for_label }}">نام بانک</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-university"></i></span>
+                                {{ form.bank_name }}
+                            </div>
+                            {% if form.bank_name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.bank_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- شماره حساب/کارت -->
+                        <div class="col-md-6 bank-only" style="display: none;">
+                            <label class="form-label" for="{{ form.account_number.id_for_label }}">شماره حساب/کارت</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                                {{ form.account_number }}
+                            </div>
+                            {% if form.account_number.errors %}
+                            <div class="invalid-feedback d-block">{{ form.account_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- توضیحات -->
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.description.id_for_label }}">توضیحات</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-comment"></i></span>
+                                {{ form.description }}
+                            </div>
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- وضعیت -->
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="id_is_active">حساب فعال است</label>
+                            </div>
+                        </div>
+
+                        <!-- دکمه‌ها -->
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                ذخیره
+                            </button>
+                            <a href="{% url 'core:account_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                انصراف
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeInputs = document.querySelectorAll('input[name="account_type"]');
+    const bankFields = document.querySelectorAll('.bank-only');
+
+    function updateFields() {
+        const selectedType = document.querySelector('input[name="account_type"]:checked').value;
+        bankFields.forEach(field => {
+            field.style.display = ['bank', 'card'].includes(selectedType) ? 'block' : 'none';
+        });
+    }
+
+    typeInputs.forEach(input => {
+        input.addEventListener('change', updateFields);
+    });
+
+    // اجرای اولیه برای تنظیم وضعیت فیلدها
+    updateFields();
+});
+</script>
+{% endblock %}
+
+{% endblock %} 

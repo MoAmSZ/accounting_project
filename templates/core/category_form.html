@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}ویرایش دسته‌بندی{% else %}دسته‌بندی جدید{% endif %} - حسابداری شخصی{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- هدر صفحه -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <div class="icon-circle me-3">
+                <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus{% endif %} fa-lg"></i>
+            </div>
+            <div>
+                <h3 class="mb-1">{% if form.instance.pk %}ویرایش دسته‌بندی{% else %}دسته‌بندی جدید{% endif %}</h3>
+                <p class="text-muted mb-0">{% if form.instance.pk %}ویرایش اطلاعات دسته‌بندی موجود{% else %}افزودن دسته‌بندی جدید به سیستم{% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- فرم -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form method="post" class="row g-3">
+                        {% csrf_token %}
+
+                        <!-- نوع دسته‌بندی -->
+                        <div class="col-12">
+                            <label class="form-label">نوع دسته‌بندی</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="type" id="type_income" value="income" {% if form.type.value == 'income' %}checked{% endif %}>
+                                <label class="btn btn-outline-success" for="type_income">
+                                    <i class="fas fa-arrow-down me-1"></i>
+                                    درآمد
+                                </label>
+
+                                <input type="radio" class="btn-check" name="type" id="type_expense" value="expense" {% if form.type.value == 'expense' %}checked{% endif %}>
+                                <label class="btn btn-outline-danger" for="type_expense">
+                                    <i class="fas fa-arrow-up me-1"></i>
+                                    هزینه
+                                </label>
+                            </div>
+                            {% if form.type.errors %}
+                            <div class="invalid-feedback d-block">{{ form.type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- نام دسته‌بندی -->
+                        <div class="col-md-6">
+                            <label class="form-label">نام دسته‌بندی</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                {{ form.name }}
+                            </div>
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- آیکون -->
+                        <div class="col-md-6">
+                            <label class="form-label">آیکون</label>
+                            <div class="input-group">
+                                <span class="input-group-text preview-icon"><i class="fas fa-icons"></i></span>
+                                {{ form.icon }}
+                            </div>
+                            {% if form.icon.errors %}
+                            <div class="invalid-feedback d-block">{{ form.icon.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- رنگ -->
+                        <div class="col-md-6">
+                            <label class="form-label">رنگ</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-palette"></i></span>
+                                {{ form.color }}
+                            </div>
+                            {% if form.color.errors %}
+                            <div class="invalid-feedback d-block">{{ form.color.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- توضیحات -->
+                        <div class="col-12">
+                            <label class="form-label">توضیحات</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-comment"></i></span>
+                                {{ form.description }}
+                            </div>
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- دکمه‌ها -->
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                ذخیره
+                            </button>
+                            <a href="{% url 'core:category_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                انصراف
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const iconInput = document.getElementById('id_icon');
+    const previewIcon = document.querySelector('.preview-icon i');
+    const colorInput = document.getElementById('id_color');
+
+    // نمایش پیش‌نمایش آیکون
+    function updateIconPreview() {
+        const iconName = iconInput.value.trim();
+        if (iconName) {
+            previewIcon.className = `fas fa-${iconName}`;
+            if (colorInput.value) {
+                previewIcon.style.color = colorInput.value;
+            }
+        }
+    }
+
+    // نمایش پیش‌نمایش رنگ
+    function updateColorPreview() {
+        const color = colorInput.value;
+        if (color) {
+            previewIcon.style.color = color;
+        }
+    }
+
+    iconInput.addEventListener('input', updateIconPreview);
+    colorInput.addEventListener('input', updateColorPreview);
+
+    // اجرای اولیه
+    updateIconPreview();
+    updateColorPreview();
+});
+</script>
+{% endblock %}
+
+{% endblock %} 

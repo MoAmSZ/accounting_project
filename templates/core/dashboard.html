@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}داشبورد - حسابداری شخصی{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- خلاصه حساب‌ها -->
+    <div class="row g-4 mb-4">
+        {% for account in accounts %}
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle me-2">
+                                <i class="fas fa-{% if account.account_type == 'cash' %}wallet{% elif account.account_type == 'bank' %}university{% elif account.account_type == 'card' %}credit-card{% else %}mobile-alt{% endif %} fa-fw"></i>
+                            </div>
+                            <h6 class="mb-0">{{ account.name }}</h6>
+                        </div>
+                        <span class="badge {% if account.is_active %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} rounded-pill">
+                            {% if account.is_active %}فعال{% else %}غیرفعال{% endif %}
+                        </span>
+                    </div>
+                    <h3 class="money-format text-end mb-0 fw-bold">{{ account.current_balance }}</h3>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="icon-circle mx-auto mb-3">
+                        <i class="fas fa-piggy-bank fa-2x"></i>
+                    </div>
+                    <p class="mb-3">هنوز هیچ حسابی تعریف نشده است.</p>
+                    <a href="{% url 'core:account_add' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>
+                        ایجاد حساب جدید
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4">
+        <!-- تراکنش‌های اخیر -->
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle me-2">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <h5 class="mb-0">تراکنش‌های اخیر</h5>
+                        </div>
+                        <a href="{% url 'core:transaction_add' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus me-1"></i>
+                            تراکنش جدید
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="border-0">تاریخ</th>
+                                    <th class="border-0">نوع</th>
+                                    <th class="border-0">حساب</th>
+                                    <th class="border-0">دسته‌بندی/حساب مقصد</th>
+                                    <th class="border-0">مبلغ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in recent_transactions %}
+                                <tr>
+                                    <td class="date-format" data-date="{{ transaction.date|date:'c' }}">
+                                        {{ transaction.date|date:'c' }}
+                                    </td>
+                                    <td>
+                                        <span class="badge rounded-pill {% if transaction.type == 'income' %}bg-success-subtle text-success{% elif transaction.type == 'expense' %}bg-danger-subtle text-danger{% else %}bg-info-subtle text-info{% endif %}">
+                                            {{ transaction.get_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="d-inline-block text-truncate" style="max-width: 150px;">
+                                            {{ transaction.account.name }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if transaction.type in 'transfer_in,transfer_out' %}
+                                            <span class="d-inline-block text-truncate" style="max-width: 150px;">
+                                                {{ transaction.related_account.name }}
+                                            </span>
+                                        {% else %}
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-circle me-2" style="width: 24px; height: 24px;">
+                                                    <i class="fas fa-{{ transaction.category.icon }} fa-sm"></i>
+                                                </div>
+                                                <span>{{ transaction.category.name }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="money-format fw-bold {% if transaction.type == 'income' %}text-success{% elif transaction.type == 'expense' %}text-danger{% endif %}">
+                                        {{ transaction.amount }}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="icon-circle mx-auto mb-3">
+                                            <i class="fas fa-receipt fa-2x"></i>
+                                        </div>
+                                        <p class="mb-0">هیچ تراکنشی ثبت نشده است.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- اهداف پس‌انداز -->
+        <div class="col-12 col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle me-2">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <h5 class="mb-0">اهداف پس‌انداز</h5>
+                        </div>
+                        <a href="{% url 'core:saving_goal_add' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus me-1"></i>
+                            هدف جدید
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% for goal in active_goals %}
+                    <div class="mb-4 {% if not forloop.last %}border-bottom pb-4{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0 text-truncate" style="max-width: 70%;">{{ goal.title }}</h6>
+                            <small class="text-muted date-format" data-date="{{ goal.deadline|date:'c' }}">{{ goal.deadline|date:'c' }}</small>
+                        </div>
+                        <div class="progress mb-2" style="height: 8px;">
+                            <div class="progress-bar" role="progressbar" style="width: {% widthratio goal.current_amount goal.target_amount 100 %}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="money-format text-success">{{ goal.current_amount }}</small>
+                            <small class="money-format text-primary">{{ goal.target_amount }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <div class="icon-circle mx-auto mb-3">
+                            <i class="fas fa-bullseye fa-2x"></i>
+                        </div>
+                        <p class="mb-3">هیچ هدف فعالی تعریف نشده است.</p>
+                        <a href="{% url 'core:saving_goal_add' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus me-1"></i>
+                            تعریف هدف جدید
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

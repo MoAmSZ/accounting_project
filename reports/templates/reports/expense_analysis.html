@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}تحلیل هزینه‌ها{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .card-title {
+        color: var(--bs-primary);
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .card-title i {
+        font-size: 1.2rem;
+        opacity: 0.8;
+    }
+    
+    .table {
+        margin: 0;
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: var(--bs-gray-700);
+        border-bottom-width: 1px;
+    }
+    
+    .table td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+    }
+    
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        background-color: var(--bs-gray-200);
+    }
+    
+    .progress-bar {
+        background: linear-gradient(45deg, #f44336, #ef9a9a);
+        border-radius: 4px;
+        transition: width 0.5s ease-in-out;
+    }
+    
+    .money-format {
+        font-family: var(--bs-font-monospace);
+        color: var(--bs-danger);
+        font-weight: 600;
+    }
+    
+    .number-format {
+        font-family: var(--bs-font-monospace);
+        color: var(--bs-gray-700);
+    }
+    
+    .period-select {
+        border-radius: 10px;
+        border: 1px solid var(--bs-gray-200);
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    
+    .period-select:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.2rem rgba(244, 67, 54, 0.15);
+    }
+    
+    @media (max-width: 768px) {
+        .card {
+            margin-bottom: 1rem;
+        }
+        
+        .card-header {
+            padding: 1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .table-responsive {
+            margin: 0 -1rem;
+            padding: 0 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- فیلترها -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">دوره زمانی</label>
+                    <select name="period" class="form-select period-select" onchange="this.form.submit()">
+                        <option value="month" {% if period == 'month' %}selected{% endif %}>ماه جاری</option>
+                        <option value="year" {% if period == 'year' %}selected{% endif %}>سال جاری</option>
+                        <option value="all" {% if period == 'all' %}selected{% endif %}>کل دوره‌ها</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- تحلیل هزینه‌ها بر اساس دسته‌بندی -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        هزینه‌ها بر اساس دسته‌بندی
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>دسته‌بندی</th>
+                                    <th>تعداد</th>
+                                    <th>مجموع</th>
+                                    <th style="width: 30%;">درصد</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in category_analysis %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-folder me-2 text-danger"></i>
+                                            {{ category.category__name }}
+                                        </div>
+                                    </td>
+                                    <td class="number-format">{{ category.count }}</td>
+                                    <td class="money-format">{{ category.total|money_format }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: {{ category.percentage }}%"></div>
+                                            </div>
+                                            <span class="ms-2 small">{{ category.percentage|floatformat:1 }}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- نمودار روند هزینه‌ها -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        روند هزینه‌ها
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="expenseTrendChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نمودار دایره‌ای هزینه‌ها -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        توزیع هزینه‌ها
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="expensePieChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    Chart.defaults.font.family = 'Vazir';
+    Chart.defaults.font.size = 13;
+    
+    const chartColors = [
+        '#f44336', '#2196f3', '#ff9800', '#4caf50', '#9c27b0',
+        '#00bcd4', '#795548', '#607d8b', '#e91e63', '#673ab7'
+    ];
+    
+    // نمودار روند هزینه‌ها
+    const trendCtx = document.getElementById('expenseTrendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: [{% for item in expense_trend %}'{{ item.month|date:"Y-m" }}',{% endfor %}],
+            datasets: [{
+                label: 'هزینه‌ها',
+                data: [{% for item in expense_trend %}{{ item.total }},{% endfor %}],
+                borderColor: '#f44336',
+                backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#000',
+                    titleFont: {
+                        size: 13
+                    },
+                    bodyColor: '#666',
+                    bodyFont: {
+                        size: 12
+                    },
+                    borderColor: 'rgba(0, 0, 0, 0.1)',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + toFarsiNumber(context.raw.toLocaleString());
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return toFarsiNumber(value.toLocaleString());
+                        },
+                        padding: 10
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        padding: 10
+                    }
+                }
+            }
+        }
+    });
+
+    // نمودار دایره‌ای هزینه‌ها
+    const pieCtx = document.getElementById('expensePieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for category in category_analysis %}'{{ category.category__name }}',{% endfor %}],
+            datasets: [{
+                data: [{% for category in category_analysis %}{{ category.total }},{% endfor %}],
+                backgroundColor: chartColors,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#000',
+                    titleFont: {
+                        size: 13
+                    },
+                    bodyColor: '#666',
+                    bodyFont: {
+                        size: 12
+                    },
+                    borderColor: 'rgba(0, 0, 0, 0.1)',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + toFarsiNumber(context.raw.toLocaleString());
+                        }
+                    }
+                }
+            },
+            cutout: '60%',
+            radius: '90%'
+        }
+    });
+</script>
+{% endblock %} 
