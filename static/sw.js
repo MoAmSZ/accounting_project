@@ -4,9 +4,9 @@ const DYNAMIC_CACHE = 'dynamic-v1';
 
 const STATIC_ASSETS = [
     '/',
-    '/static/manifest.json',
-    '/static/icons/icon-192x192.png',
-    '/static/icons/icon-512x512.png',
+    'manifest.json',
+    'icons/icon-192x192.png',
+    'icons/icon-512x512.png',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
     'https://cdn.jsdelivr.net/npm/persian.js@0.4.0/persian.min.js',
@@ -42,13 +42,21 @@ self.addEventListener('activate', event => {
 
 // Fetch Event
 self.addEventListener('fetch', event => {
+    // اگر درخواست برای CDN است، مستقیماً به شبکه برو
+    if (event.request.url.includes('cdn.jsdelivr.net') || 
+        event.request.url.includes('cdnjs.cloudflare.com') ||
+        event.request.url.includes('fonts.googleapis.com')) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request)
             .then(cacheRes => {
                 return cacheRes || fetch(event.request).then(fetchRes => {
                     return caches.open(DYNAMIC_CACHE)
                         .then(cache => {
-                            // Store the response in cache if it's a valid response
+                            // فقط درخواست‌های موفق را کش کن
                             if (fetchRes.status === 200) {
                                 cache.put(event.request.url, fetchRes.clone());
                             }
@@ -56,8 +64,9 @@ self.addEventListener('fetch', event => {
                         });
                 });
             }).catch(() => {
-                // If both cache and network fail, show offline page
-                if (event.request.url.indexOf('.html') > -1) {
+                // اگر درخواست HTML بود و با خطا مواجه شد، صفحه اصلی را نمایش بده
+                if (event.request.url.indexOf('.html') > -1 || 
+                    event.request.mode === 'navigate') {
                     return caches.match('/');
                 }
             })
